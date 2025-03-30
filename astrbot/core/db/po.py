@@ -1,11 +1,10 @@
-"""指标数据"""
-
 from dataclasses import dataclass, field
 from typing import List
 
 
 @dataclass
 class Platform:
+    """平台消息计数"""
     name: str
     count: int
     timestamp: int
@@ -36,7 +35,7 @@ class Stats:
 class Conversation:
     """LLM 对话存储
 
-    对于网页聊天，history 存储了包括指令、回复、图片等在内的所有消息。
+    对于网页聊天, history 存储了包括指令、回复、图片等在内的所有消息。
     对于其他平台的聊天，不存储非 LLM 的回复（因为考虑到已经存储在各自的平台上）。
     """
 
