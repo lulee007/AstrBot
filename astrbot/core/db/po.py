@@ -19,13 +19,6 @@ class Provider:
 
 
 @dataclass
-class Plugin:
-    name: str
-    count: int
-    timestamp: int
-
-
-@dataclass
 class Command:
     name: str
     count: int
@@ -37,30 +30,6 @@ class Stats:
     platform: List[Platform] = field(default_factory=list)
     command: List[Command] = field(default_factory=list)
     llm: List[Provider] = field(default_factory=list)
-
-
-@dataclass
-class LLMHistory:
-    """LLM 聊天时持久化的信息"""
-
-    provider_type: str
-    session_id: str
-    content: str
-
-
-@dataclass
-class ATRIVision:
-    """Deprecated"""
-
-    id: str
-    url_or_path: str
-    caption: str
-    is_meme: bool
-    keywords: List[str]
-    platform_name: str
-    session_id: str
-    sender_nickname: str
-    timestamp: int = -1
 
 
 @dataclass

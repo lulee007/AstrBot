@@ -8,11 +8,6 @@ CREATE TABLE IF NOT EXISTS llm(
     count INTEGER,
     timestamp INTEGER
 );
-CREATE TABLE IF NOT EXISTS plugin(
-    name VARCHAR(32),
-    count INTEGER,
-    timestamp INTEGER
-);
 CREATE TABLE IF NOT EXISTS command(
     name VARCHAR(32),
     count INTEGER,
@@ -24,18 +19,6 @@ CREATE TABLE IF NOT EXISTS llm_history(
     content TEXT
 );
 
--- ATRI
-CREATE TABLE IF NOT EXISTS atri_vision(
-    id TEXT,
-    url_or_path TEXT,
-    caption TEXT,
-    is_meme BOOLEAN,
-    keywords TEXT,
-    platform_name VARCHAR(32),
-    session_id VARCHAR(32),
-    sender_nickname VARCHAR(32),
-    timestamp INTEGER
-);
 
 CREATE TABLE IF NOT EXISTS webchat_conversation(
     user_id TEXT, -- 会话 id
