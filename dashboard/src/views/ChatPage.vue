@@ -895,15 +895,13 @@ export default {
 
             // Convert image filenames to blob URLs for display
             if (imageNamesToSend.length > 0) {
-                for (let i = 0; i < imageNamesToSend.length; i++) {
-                    // If it's just a filename, get the blob URL
-                    if (!imageNamesToSend[i].startsWith('blob:')) {
-                        const imgUrl = await this.getMediaFile(imageNamesToSend[i]);
-                        userMessage.image_url.push(imgUrl);
-                    } else {
-                        userMessage.image_url.push(imageNamesToSend[i]);
+                const imagePromises = imageNamesToSend.map(name => {
+                    if (!name.startsWith('blob:')) {
+                        return this.getMediaFile(name);
                     }
-                }
+                    return Promise.resolve(name);
+                });
+                userMessage.image_url = await Promise.all(imagePromises);
             }
 
             // Convert audio filename to blob URL for display
