@@ -703,6 +703,12 @@ export default {
         },
 
         removeImage(index) {
+            // Revoke the blob URL to prevent memory leaks
+            const urlToRevoke = this.stagedImagesUrl[index];
+            if (urlToRevoke && urlToRevoke.startsWith('blob:')) {
+                URL.revokeObjectURL(urlToRevoke);
+            }
+
             this.stagedImagesName.splice(index, 1);
             this.stagedImagesUrl.splice(index, 1);
         },
