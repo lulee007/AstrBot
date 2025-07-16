@@ -226,7 +226,7 @@
                                     <ProviderModelSelector ref="providerModelSelector" />
                                 </div>
                                 <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-                                    <input type="file" ref="imageInput" @change="handleFileSelect" accept="image/*" style="display: none" />
+                                    <input type="file" ref="imageInput" @change="handleFileSelect" accept="image/*" style="display: none" multiple />
                                     <v-btn @click="triggerImageInput" icon="mdi-plus" variant="text" color="deep-purple"
                                         class="add-btn" size="small" />
                                     <v-btn @click="sendMessage" icon="mdi-send" variant="text" color="deep-purple"
@@ -716,9 +716,11 @@ export default {
         },
 
         handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file) {
-                this.processAndUploadImage(file);
+            const files = event.target.files;
+            if (files) {
+                for (const file of files) {
+                    this.processAndUploadImage(file);
+                }
             }
             // Reset the input value to allow selecting the same file again
             event.target.value = '';
