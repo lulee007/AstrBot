@@ -721,7 +721,7 @@ export default {
                 this.processAndUploadImage(file);
             }
             // Reset the input value to allow selecting the same file again
-            event.target.value = null;
+            event.target.value = '';
         },
         getConversations() {
             axios.get('/api/chat/conversations').then(response => {
