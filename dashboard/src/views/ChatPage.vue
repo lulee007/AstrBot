@@ -226,6 +226,9 @@
                                     <ProviderModelSelector ref="providerModelSelector" />
                                 </div>
                                 <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+                                    <input type="file" ref="imageInput" @change="handleFileSelect" accept="image/*" style="display: none" />
+                                    <v-btn @click="triggerImageInput" icon="mdi-plus" variant="text" color="deep-purple"
+                                        class="add-btn" size="small" />
                                     <v-btn @click="sendMessage" icon="mdi-send" variant="text" color="deep-purple"
                                         :disabled="!prompt && stagedImagesName.length === 0 && !stagedAudioUrl"
                                         class="send-btn" size="small" />
@@ -668,29 +671,33 @@ export default {
             };
         },
 
+        async processAndUploadImage(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await axios.post('/api/chat/post_image', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                const img = response.data.data.filename;
+                this.stagedImagesName.push(img); // Store just the filename
+                this.stagedImagesUrl.push(URL.createObjectURL(file)); // Create a blob URL for immediate display
+
+            } catch (err) {
+                console.error('Error uploading image:', err);
+            }
+        },
+
         async handlePaste(event) {
             console.log('Pasting image...');
             const items = event.clipboardData.items;
             for (let i = 0; i < items.length; i++) {
                 if (items[i].type.indexOf('image') !== -1) {
                     const file = items[i].getAsFile();
-                    const formData = new FormData();
-                    formData.append('file', file);
-
-                    try {
-                        const response = await axios.post('/api/chat/post_image', formData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data'
-                            }
-                        });
-
-                        const img = response.data.data.filename;
-                        this.stagedImagesName.push(img); // Store just the filename
-                        this.stagedImagesUrl.push(URL.createObjectURL(file)); // Create a blob URL for immediate display
-
-                    } catch (err) {
-                        console.error('Error uploading image:', err);
-                    }
+                    this.processAndUploadImage(file);
                 }
             }
         },
@@ -702,6 +709,17 @@ export default {
 
         clearMessage() {
             this.prompt = '';
+        },
+
+        triggerImageInput() {
+            this.$refs.imageInput.click();
+        },
+
+        handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.processAndUploadImage(file);
+            }
         },
         getConversations() {
             axios.get('/api/chat/conversations').then(response => {
