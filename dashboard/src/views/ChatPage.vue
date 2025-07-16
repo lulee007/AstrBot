@@ -866,33 +866,44 @@ export default {
                 // URL is already updated in newConversation method
             }
 
+            // 保存当前要发送的数据到临时变量
+            const promptToSend = this.prompt.trim();
+            const imageNamesToSend = [...this.stagedImagesName];
+            const audioNameToSend = this.stagedAudioUrl;
+
+            // 立即清空输入和附件预览
+            this.prompt = '';
+            this.stagedImagesName = [];
+            this.stagedImagesUrl = [];
+            this.stagedAudioUrl = "";
+
             // Create a message object with actual URLs for display
             const userMessage = {
                 type: 'user',
-                message: this.prompt.trim(), // 使用 trim() 去除前后空格
+                message: promptToSend,
                 image_url: [],
                 audio_url: null
             };
 
             // Convert image filenames to blob URLs for display
-            if (this.stagedImagesName.length > 0) {
-                for (let i = 0; i < this.stagedImagesName.length; i++) {
+            if (imageNamesToSend.length > 0) {
+                for (let i = 0; i < imageNamesToSend.length; i++) {
                     // If it's just a filename, get the blob URL
-                    if (!this.stagedImagesName[i].startsWith('blob:')) {
-                        const imgUrl = await this.getMediaFile(this.stagedImagesName[i]);
+                    if (!imageNamesToSend[i].startsWith('blob:')) {
+                        const imgUrl = await this.getMediaFile(imageNamesToSend[i]);
                         userMessage.image_url.push(imgUrl);
                     } else {
-                        userMessage.image_url.push(this.stagedImagesName[i]);
+                        userMessage.image_url.push(imageNamesToSend[i]);
                     }
                 }
             }
 
             // Convert audio filename to blob URL for display
-            if (this.stagedAudioUrl) {
-                if (!this.stagedAudioUrl.startsWith('blob:')) {
-                    userMessage.audio_url = await this.getMediaFile(this.stagedAudioUrl);
+            if (audioNameToSend) {
+                if (!audioNameToSend.startsWith('blob:')) {
+                    userMessage.audio_url = await this.getMediaFile(audioNameToSend);
                 } else {
-                    userMessage.audio_url = this.stagedAudioUrl;
+                    userMessage.audio_url = audioNameToSend;
                 }
             }
 
@@ -905,8 +916,6 @@ export default {
             const selection = this.$refs.providerModelSelector?.getCurrentSelection();
             const selectedProviderId = selection?.providerId || '';
             const selectedModelName = selection?.modelName || '';
-            let prompt = this.prompt.trim();
-            this.prompt = ''; // 清空输入框
 
             try {
                 const response = await fetch('/api/chat/send', {
@@ -916,10 +925,10 @@ export default {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
                     body: JSON.stringify({
-                        message: prompt,
+                        message: promptToSend,
                         conversation_id: this.currCid,
-                        image_url: this.stagedImagesName,
-                        audio_url: this.stagedAudioUrl ? [this.stagedAudioUrl] : [],
+                        image_url: imageNamesToSend,
+                        audio_url: audioNameToSend ? [audioNameToSend] : [],
                         selected_provider: selectedProviderId,
                         selected_model: selectedModelName
                     })
@@ -1023,11 +1032,7 @@ export default {
                     }
                 }
 
-                // Clear input after successful send
-                this.prompt = '';
-                this.stagedImagesName = [];
-                this.stagedImagesUrl = [];
-                this.stagedAudioUrl = "";
+                // Input and attachments are already cleared
                 this.loadingChat = false;
 
                 // get the latest conversations
