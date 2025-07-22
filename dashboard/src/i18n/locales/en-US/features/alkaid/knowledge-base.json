@@ -75,7 +75,8 @@
     "usage": "Usage: Enter \"/kb use {name}\" in the chat page",
     "tabs": {
       "upload": "Upload Files",
-      "search": "Search Content"
+      "search": "Search Content",
+      "fromURL": "From URL"
     }
   },
   "upload": {
@@ -132,5 +133,24 @@
     "deleteFailed": "Deletion failed",
     "deleteKnowledgeBaseFailed": "Failed to delete knowledge base",
     "getEmbeddingModelListFailed": "Failed to get embedding model list"
+  },
+  "importFromUrl": {
+    "title": "Import from URL",
+    "urlLabel": "Web Page URL",
+    "urlPlaceholder": "Enter the URL of the web page to extract knowledge from",
+    "optionsTitle": "Import Options",
+    "tooltip": "These options control how text is extracted and processed from the URL content.\nLeave blank to use the plugin's default settings.",
+    "useLlmRepairLabel": "Enable LLM Text Repair",
+    "useClusteringSummaryLabel": "Enable Clustering Summary",
+    "repairLlmProviderIdLabel": "Text Repair Model",
+    "summarizeLlmProviderIdLabel": "Summarize Model",
+    "embeddingProviderIdLabel": "Embedding Model",
+    "chunkSizeLabel": "Chunk Size",
+    "chunkOverlapLabel": "Chunk Overlap",
+    "startImport": "Start Import",
+    "importing": "Importing...",
+    "importSuccess": "Import Successful",
+    "importFailed": "Import Failed",
+    "uploadingChunks": "Uploading chunks ({current}/{total})..."
   }
-} 
+}

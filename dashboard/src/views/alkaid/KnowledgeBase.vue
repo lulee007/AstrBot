@@ -147,6 +147,7 @@
                     <v-tabs v-model="activeTab">
                         <v-tab value="upload">{{ tm('contentDialog.tabs.upload') }}</v-tab>
                         <v-tab value="search">{{ tm('contentDialog.tabs.search') }}</v-tab>
+                        <v-tab value="from-url">{{ tm('contentDialog.tabs.fromURL') }}</v-tab>
                     </v-tabs>
 
                     <v-window v-model="activeTab" class="mt-4">
@@ -269,6 +270,82 @@
                                 </div>
                             </div>
                         </v-window-item>
+
+                        <!-- 从URL导入标签页 -->
+                        <v-window-item value="from-url">
+                            <div class="from-url-container pa-4">
+                                <v-text-field v-model="importUrl" :label="tm('importFromUrl.urlLabel')"
+                                    :placeholder="tm('importFromUrl.urlPlaceholder')" variant="outlined" class="mb-4"
+                                    hide-details></v-text-field>
+
+                                <v-card class="mb-4" variant="outlined" color="grey-lighten-4">
+                                    <v-card-title class="pa-4 pb-0 d-flex align-center">
+                                        <v-icon color="primary" class="mr-2">mdi-cog-outline</v-icon>
+                                        <span class="text-subtitle-1 font-weight-bold">{{ tm('importFromUrl.optionsTitle')
+                                        }}</span>
+                                        <v-tooltip location="top">
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon v-bind="props" class="ml-2" size="small"
+                                                    color="grey">mdi-information-outline</v-icon>
+                                            </template>
+                                            <span>{{ tm('importFromUrl.tooltip') }}</span>
+                                        </v-tooltip>
+                                    </v-card-title>
+                                    <v-card-text class="pa-4 pt-2">
+                                        <v-row>
+                                            <v-col cols="12" md="6">
+                                                <v-switch v-model="importOptions.use_llm_repair"
+                                                    :label="tm('importFromUrl.useLlmRepairLabel')" color="primary"
+                                                    inset></v-switch>
+                                            </v-col>
+                                            <v-col cols="12" md="6">
+                                                <v-switch v-model="importOptions.use_clustering_summary"
+                                                    :label="tm('importFromUrl.useClusteringSummaryLabel')" color="primary"
+                                                    inset></v-switch>
+                                            </v-col>
+                                            <v-col cols="12" md="6">
+                                                <v-select v-model="importOptions.repair_llm_provider_id"
+                                                    :items="llmProviderConfigs" :item-props="llmModelProps"
+                                                    :label="tm('importFromUrl.repairLlmProviderIdLabel')" variant="outlined"
+                                                    clearable></v-select>
+                                            </v-col>
+                                            <v-col cols="12" md="6">
+                                                <v-select v-model="importOptions.summarize_llm_provider_id"
+                                                    :items="llmProviderConfigs" :item-props="llmModelProps"
+                                                    :label="tm('importFromUrl.summarizeLlmProviderIdLabel')"
+                                                    variant="outlined" clearable></v-select>
+                                            </v-col>
+                                            <v-col cols="12" md="6">
+                                                <v-select v-model="importOptions.embedding_provider_id"
+                                                    :items="embeddingProviderConfigs" :item-props="embeddingModelProps"
+                                                    :label="tm('importFromUrl.embeddingProviderIdLabel')"
+                                                    variant="outlined" clearable></v-select>
+                                            </v-col>
+                                            <v-col cols="12" md="3">
+                                                <v-text-field v-model="importOptions.chunk_size"
+                                                    :label="tm('importFromUrl.chunkSizeLabel')" type="number"
+                                                    variant="outlined" clearable></v-text-field>
+                                            </v-col>
+                                            <v-col cols="12" md="3">
+                                                <v-text-field v-model="importOptions.chunk_overlap"
+                                                    :label="tm('importFromUrl.chunkOverlapLabel')" type="number"
+                                                    variant="outlined" clearable></v-text-field>
+                                            </v-col>
+                                        </v-row>
+                                    </v-card-text>
+                                </v-card>
+
+                                <div class="text-center">
+                                    <v-btn color="primary" variant="elevated" :loading="importing"
+                                        :disabled="!importUrl" @click="startImportFromUrl">
+                                        {{ tm('importFromUrl.startImport') }}
+                                    </v-btn>
+                                </div>
+
+                                <ConsoleDisplayer v-show="importing" ref="importConsole" style="background-color: #fff; max-height: 300px; margin-top: 16px; max-width: 100%" :show-level-btns="false"></ConsoleDisplayer>
+
+                            </div>
+                        </v-window-item>
                     </v-window>
                 </v-card-text>
             </v-card>
@@ -375,14 +452,34 @@ export default {
                 collection_name: ''
             },
             deleting: false,
-            embeddingProviderConfigs: []
+            embeddingProviderConfigs: [],
+            llmProviderConfigs: [],
+            importUrl: '',
+            importOptions: {
+                use_llm_repair: true,
+                use_clustering_summary: true,
+                repair_llm_provider_id: '',
+                summarize_llm_provider_id: '',
+                embedding_provider_id: '',
+                chunk_size: null,
+                chunk_overlap: null,
+            },
+            importing: false,
+            importConsoleContent: ''
         }
     },
     mounted() {
         this.checkPlugin();
         this.getEmbeddingProviderList();
+        this.getLlmProviderList();
     },
     methods: {
+        llmModelProps(providerConfig) {
+            return {
+                title: providerConfig.llm_model || providerConfig.id,
+                subtitle: `Provider ID: ${providerConfig.id}`,
+            }
+        },
         embeddingModelProps(providerConfig) {
             return {
                 title: providerConfig.embedding_model,
@@ -704,7 +801,26 @@ export default {
 
         openUrl(url) {
             window.open(url, '_blank');
-        }
+        },
+
+        getLlmProviderList() {
+            axios.get('/api/config/provider/list', {
+                params: {
+                    provider_type: 'chat_completion'
+                }
+            })
+                .then(response => {
+                    if (response.data.status === 'ok') {
+                        this.llmProviderConfigs = response.data.data || [];
+                    } else {
+                        this.showSnackbar(response.data.message || 'Failed to get LLM provider list', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching LLM providers:', error);
+                    this.showSnackbar('Failed to get LLM provider list', 'error');
+                });
+        },
     }
 }
 </script>
