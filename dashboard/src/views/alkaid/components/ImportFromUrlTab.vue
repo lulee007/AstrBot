@@ -179,14 +179,25 @@ export default {
     },
     async handleImportResult(data) {
       const chunks = [];
-      if (data.result.topics && data.result.topics.length > 0) {
-        data.result.topics.forEach((topic, index) => {
-          chunks.push({ content: topic, filename: `topic_${index + 1}.txt` });
+      const result = data.result;
+
+      // 1. Handle overall summary
+      if (result.overall_summary) {
+        chunks.push({ content: result.overall_summary, filename: 'overall_summary.txt' });
+      }
+
+      // 2. Handle topic summaries
+      if (result.topics && result.topics.length > 0) {
+        result.topics.forEach(topic => {
+          if (topic.topic_summary) {
+            chunks.push({ content: topic.topic_summary, filename: `topic_${topic.topic_id}_summary.txt` });
+          }
         });
       }
-      if (data.result.noise_points && data.result.noise_points.length > 0) {
-        data.result.noise_points.forEach((point, index) => {
-          // Ensure we are pushing the text content, not the whole object
+
+      // 3. Handle noise points
+      if (result.noise_points && result.noise_points.length > 0) {
+        result.noise_points.forEach((point, index) => {
           const content = typeof point === 'object' && point.text ? point.text : point;
           chunks.push({ content: content, filename: `noise_${index + 1}.txt` });
         });
