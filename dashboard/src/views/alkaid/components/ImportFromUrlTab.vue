@@ -90,15 +90,42 @@ export default {
       importUrl: '',
       importOptions: {
         use_llm_repair: true,
-        use_clustering_summary: true,
+        use_clustering_summary: false,
         repair_llm_provider_id: null,
         summarize_llm_provider_id: null,
         embedding_provider_id: null,
-        chunk_size: null,
-        chunk_overlap: null,
+        chunk_size: 300,
+        chunk_overlap: 50,
       },
       importing: false,
     };
+  },
+  watch: {
+    llmProviderConfigs: {
+      handler(newVal) {
+        if (newVal && newVal.length > 0) {
+          if (!this.importOptions.repair_llm_provider_id) {
+            this.importOptions.repair_llm_provider_id = newVal[0].id;
+          }
+          if (!this.importOptions.summarize_llm_provider_id) {
+            this.importOptions.summarize_llm_provider_id = newVal[0].id;
+          }
+        }
+      },
+      immediate: true,
+      deep: true
+    },
+    embeddingProviderConfigs: {
+      handler(newVal) {
+        if (newVal && newVal.length > 0) {
+          if (!this.importOptions.embedding_provider_id) {
+            this.importOptions.embedding_provider_id = newVal[0].id;
+          }
+        }
+      },
+      immediate: true,
+      deep: true
+    }
   },
   methods: {
     llmModelProps(providerConfig) {
