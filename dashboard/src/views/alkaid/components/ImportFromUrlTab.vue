@@ -24,29 +24,36 @@
             <v-switch v-model="importOptions.use_clustering_summary"
               :label="tm('importFromUrl.useClusteringSummaryLabel')" color="primary" inset></v-switch>
           </v-col>
-          <v-col cols="12" md="6">
-            <v-select v-model="importOptions.repair_llm_provider_id" :items="llmProviderConfigs" item-value="id"
-              :item-props="llmModelProps" :label="tm('importFromUrl.repairLlmProviderIdLabel')" variant="outlined"
-              clearable></v-select>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-select v-model="importOptions.summarize_llm_provider_id" :items="llmProviderConfigs" item-value="id"
-              :item-props="llmModelProps" :label="tm('importFromUrl.summarizeLlmProviderIdLabel')" variant="outlined"
-              clearable></v-select>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-select v-model="importOptions.embedding_provider_id" :items="embeddingProviderConfigs" item-value="id"
-              :item-props="embeddingModelProps" :label="tm('importFromUrl.embeddingProviderIdLabel')" variant="outlined"
-              clearable></v-select>
-          </v-col>
-          <v-col cols="12" md="3">
-            <v-text-field v-model="importOptions.chunk_size" :label="tm('importFromUrl.chunkSizeLabel')" type="number"
-              variant="outlined" clearable></v-text-field>
-          </v-col>
-          <v-col cols="12" md="3">
-            <v-text-field v-model="importOptions.chunk_overlap" :label="tm('importFromUrl.chunkOverlapLabel')"
-              type="number" variant="outlined" clearable></v-text-field>
-          </v-col>
+          <v-row>
+            <!-- Optional Repair Selector -->
+            <v-col v-if="importOptions.use_llm_repair" :md="optionalSelectorColWidth" cols="12">
+              <v-select v-model="importOptions.repair_llm_provider_id" :items="llmProviderConfigs" item-value="id"
+                :item-props="llmModelProps" :label="tm('importFromUrl.repairLlmProviderIdLabel')" variant="outlined"
+                clearable></v-select>
+            </v-col>
+
+            <!-- Optional Summary Selector -->
+            <v-col v-if="importOptions.use_clustering_summary" :md="optionalSelectorColWidth" cols="12">
+              <v-select v-model="importOptions.summarize_llm_provider_id" :items="llmProviderConfigs" item-value="id"
+                :item-props="llmModelProps" :label="tm('importFromUrl.summarizeLlmProviderIdLabel')" variant="outlined"
+                clearable></v-select>
+            </v-col>
+
+            <!-- This is the fixed layout group that will wrap automatically -->
+            <v-col cols="12" md="6">
+              <v-select v-model="importOptions.embedding_provider_id" :items="embeddingProviderConfigs" item-value="id"
+                :item-props="embeddingModelProps" :label="tm('importFromUrl.embeddingProviderIdLabel')"
+                variant="outlined" clearable></v-select>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-text-field v-model="importOptions.chunk_size" :label="tm('importFromUrl.chunkSizeLabel')" type="number"
+                variant="outlined" clearable></v-text-field>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-text-field v-model="importOptions.chunk_overlap" :label="tm('importFromUrl.chunkOverlapLabel')"
+                type="number" variant="outlined" clearable></v-text-field>
+            </v-col>
+          </v-row>
         </v-row>
       </v-card-text>
     </v-card>
@@ -84,6 +91,16 @@ export default {
   setup() {
     const { tm } = useModuleI18n('features/alkaid/knowledge-base');
     return { tm };
+  },
+  computed: {
+    optionalSelectorColWidth() {
+      const repairOn = this.importOptions.use_llm_repair;
+      const summaryOn = this.importOptions.use_clustering_summary;
+      if (repairOn && summaryOn) {
+        return 6; // Both on, each takes half
+      }
+      return 12; // Only one is on, it takes full width
+    }
   },
   data() {
     return {
@@ -291,3 +308,6 @@ export default {
   }
 }
 </script>
+<style scoped>
+/* Animations can be added back here later */
+</style>
