@@ -124,6 +124,7 @@ export default {
       snackbar: false,
       snackbarText: '',
       snackbarColor: 'success',
+      pollingInterval: null,
     };
   },
   watch: {
@@ -185,7 +186,7 @@ export default {
       try {
         const payload = {
           url: this.importUrl,
-          ...Object.fromEntries(Object.entries(this.importOptions).filter(([_, v]) => v !== ''))
+          ...Object.fromEntries(Object.entries(this.importOptions).filter(([_, v]) => v !== '' && v !== null && v !== undefined))
         };
 
 
@@ -206,7 +207,7 @@ export default {
       }
     },
     pollTaskStatus(taskId) {
-      const interval = setInterval(async () => {
+      this.pollingInterval = setInterval(async () => {
         try {
           const statusResponse = await axios.post(`/api/plug/url_2_kb/status`, { task_id: taskId });
 
@@ -215,17 +216,20 @@ export default {
 
 
           if (taskStatus === 'completed') {
-            clearInterval(interval);
+            clearInterval(this.pollingInterval);
+            this.pollingInterval = null;
             this.showSnackbar(this.tm('importFromUrl.uploadingChunks'), 'info');
             this.handleImportResult(taskData);
           } else if (taskStatus === 'failed') {
-            clearInterval(interval);
+            clearInterval(this.pollingInterval);
+            this.pollingInterval = null;
             const failureReason = taskData.result || 'Unknown reason.';
             this.showSnackbar(`${this.tm('importFromUrl.importFailed')}: ${failureReason}`, 'error');
             this.importing = false;
           }
         } catch (error) {
-          clearInterval(interval);
+          clearInterval(this.pollingInterval);
+          this.pollingInterval = null;
           const errorMessage = error.response?.data?.message || error.message || 'An unknown error occurred during polling.';
           this.showSnackbar(`Polling Error: ${errorMessage}`, 'error');
           this.importing = false;
@@ -316,7 +320,12 @@ export default {
       }
       return response.data;
     },
-  }
+  },
+ beforeUnmount() {
+   if (this.pollingInterval) {
+     clearInterval(this.pollingInterval);
+   }
+ },
 }
 </script>
 <style scoped>
