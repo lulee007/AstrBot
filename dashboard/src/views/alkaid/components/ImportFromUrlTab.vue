@@ -1,5 +1,8 @@
 <template>
   <div class="from-url-container pa-4">
+    <v-alert type="info" variant="tonal" class="mb-4" border>
+      {{ tm('importFromUrl.preRequisite') }}
+    </v-alert>
     <v-text-field v-model="importUrl" :label="tm('importFromUrl.urlLabel')"
       :placeholder="tm('importFromUrl.urlPlaceholder')" variant="outlined" class="mb-4" hide-details></v-text-field>
 
@@ -84,8 +87,8 @@ export default {
       default: () => []
     },
     embeddingProviderConfigs: {
-        type: Array,
-        default: () => []
+      type: Array,
+      default: () => []
     }
   },
   setup() {
@@ -161,7 +164,7 @@ export default {
       }
     },
     showSnackbar(text, color = 'success') {
-        this.$emit('show-snackbar', { text, color });
+      this.$emit('show-snackbar', { text, color });
     },
     async startImportFromUrl() {
       if (!this.importUrl) {

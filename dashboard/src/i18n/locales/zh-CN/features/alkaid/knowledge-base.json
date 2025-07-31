@@ -151,6 +151,7 @@
     "importing": "正在导入...",
     "importSuccess": "导入成功",
     "importFailed": "导入失败",
-    "uploadingChunks": "正在上传分片 ({current}/{total})..."
+    "uploadingChunks": "正在上传分片 ({current}/{total})...",
+    "preRequisite": "提示：请先前往插件市场安装 astrbot_plugin_url_2_knowledge_base 并根据插件文档内的指示完成 playwright 安装后才可使用本功能"
   }
 }
