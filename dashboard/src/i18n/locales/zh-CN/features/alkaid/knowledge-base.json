@@ -139,7 +139,7 @@
     "urlLabel": "网页 URL",
     "urlPlaceholder": "请输入要提取知识的网页地址",
     "optionsTitle": "导入选项",
-    "tooltip": "这些选项控制如何从URL内容中提取和处理文本。\n留空将使用插件的默认设置。",
+    "tooltip": "这些选项控制如何从URL内容中提取和处理文本。\n留空将使用插件的默认设置。\n启用LLM文本修复和摘要后可能花费时间较长。",
     "useLlmRepairLabel": "启用LLM文本修复",
     "useClusteringSummaryLabel": "启用聚类摘要",
     "repairLlmProviderIdLabel": "文本修复模型",
@@ -151,7 +151,8 @@
     "importing": "正在导入...",
     "importSuccess": "导入成功",
     "importFailed": "导入失败",
-    "uploadingChunks": "正在上传分片 ({current}/{total})...",
-    "preRequisite": "提示：请先前往插件市场安装 astrbot_plugin_url_2_knowledge_base 并根据插件文档内的指示完成 playwright 安装后才可使用本功能"
+    "uploadingChunks": "内容提取成功，正在上传分片...",
+    "preRequisite": "提示：请先前往插件市场安装 astrbot_plugin_url_2_knowledge_base 并根据插件文档内的指示完成 playwright 安装后才可使用本功能",
+    "allChunksUploaded": "所有分片上传成功"
   }
 }

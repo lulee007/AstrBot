@@ -68,6 +68,9 @@
     </div>
 
 
+   <v-snackbar v-model="snackbar" :timeout="3000" :color="snackbarColor">
+     {{ snackbarText }}
+   </v-snackbar>
   </div>
 </template>
 
@@ -118,6 +121,9 @@ export default {
         chunk_overlap: 50,
       },
       importing: false,
+      snackbar: false,
+      snackbarText: '',
+      snackbarColor: 'success',
     };
   },
   watch: {
@@ -164,7 +170,9 @@ export default {
       }
     },
     showSnackbar(text, color = 'success') {
-      this.$emit('show-snackbar', { text, color });
+     this.snackbarText = text;
+     this.snackbarColor = color;
+     this.snackbar = true;
     },
     async startImportFromUrl() {
       if (!this.importUrl) {
@@ -208,7 +216,7 @@ export default {
 
           if (taskStatus === 'completed') {
             clearInterval(interval);
-            this.showSnackbar(this.tm('importFromUrl.importSuccess'));
+            this.showSnackbar(this.tm('importFromUrl.uploadingChunks'), 'info');
             this.handleImportResult(taskData);
           } else if (taskStatus === 'failed') {
             clearInterval(interval);
@@ -274,7 +282,7 @@ export default {
       if (failCount === 0) {
         this.showSnackbar(this.tm('importFromUrl.allChunksUploaded'), 'success');
       } else if (successCount > 0) {
-        this.showSnackbar(`Import partially complete. See console for details.`, 'warning');
+        this.showSnackbar('Import partially complete. See console for details.', 'warning');
       } else {
         this.showSnackbar('Import failed. No chunks were uploaded.', 'error');
       }
