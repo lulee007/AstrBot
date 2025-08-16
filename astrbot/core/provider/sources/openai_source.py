@@ -45,7 +45,9 @@ class ProviderOpenAIOfficial(Provider):
             self.timeout = int(self.timeout)
 
         # 获取代理配置，优先使用提供商配置的代理，如果没有则使用环境变量
-        self.http_proxy = provider_config.get("http_proxy", "") or os.environ.get("http_proxy", None)
+        self.http_proxy = provider_config.get("http_proxy", "") or os.environ.get(
+            "http_proxy", None
+        )
 
         # 适配 azure openai #332
         if "api_version" in provider_config:
@@ -58,6 +60,7 @@ class ProviderOpenAIOfficial(Provider):
             }
             if self.http_proxy:
                 import httpx
+
                 kwargs["http_client"] = httpx.AsyncClient(proxy=self.http_proxy)
             self.client = AsyncAzureOpenAI(**kwargs)
         else:
@@ -69,6 +72,7 @@ class ProviderOpenAIOfficial(Provider):
             }
             if self.http_proxy:
                 import httpx
+
                 kwargs["http_client"] = httpx.AsyncClient(proxy=self.http_proxy)
             self.client = AsyncOpenAI(**kwargs)
 

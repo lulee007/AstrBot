@@ -66,7 +66,9 @@ class ProviderGoogleGenAI(Provider):
         self.timeout: int = int(provider_config.get("timeout", 180))
 
         # 获取代理配置，优先使用提供商配置的代理，如果没有则使用环境变量
-        self.http_proxy = provider_config.get("http_proxy", "") or os.environ.get("http_proxy", None)
+        self.http_proxy = provider_config.get("http_proxy", "") or os.environ.get(
+            "http_proxy", None
+        )
 
         self.api_base: Optional[str] = provider_config.get("api_base", None)
         if self.api_base and self.api_base.endswith("/"):
@@ -85,7 +87,7 @@ class ProviderGoogleGenAI(Provider):
             original_https_proxy = os.environ.get("https_proxy", None)
             os.environ["http_proxy"] = self.http_proxy
             os.environ["https_proxy"] = self.http_proxy
-            
+
             try:
                 self.client = genai.Client(
                     api_key=self.chosen_api_key,
