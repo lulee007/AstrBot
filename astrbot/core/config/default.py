@@ -598,6 +598,7 @@ CONFIG_METADATA_2 = {
                         "key": [],
                         "api_base": "https://api.openai.com/v1",
                         "timeout": 120,
+                        "http_proxy": "",
                         "model_config": {
                             "model": "gpt-4o-mini",
                             "temperature": 0.4
@@ -614,6 +615,7 @@ CONFIG_METADATA_2 = {
                         "key": [],
                         "api_base": "",
                         "timeout": 120,
+                        "http_proxy": "",
                         "model_config": {
                             "model": "gpt-4o-mini",
                             "temperature": 0.4
@@ -628,6 +630,7 @@ CONFIG_METADATA_2 = {
                         "key": [],
                         "api_base": "https://api.x.ai/v1",
                         "timeout": 120,
+                        "http_proxy": "",
                         "model_config": {
                             "model": "grok-2-latest",
                             "temperature": 0.4
@@ -643,6 +646,7 @@ CONFIG_METADATA_2 = {
                         "key": [],
                         "api_base": "https://api.anthropic.com/v1",
                         "timeout": 120,
+                        "http_proxy": "",
                         "model_config": {
                             "model": "claude-3-5-sonnet-latest",
                             "max_tokens": 4096,
@@ -684,6 +688,7 @@ CONFIG_METADATA_2 = {
                         "key": [],
                         "api_base": "https://generativelanguage.googleapis.com/v1beta/openai/",
                         "timeout": 120,
+                        "http_proxy": "",
                         "model_config": {
                             "model": "gemini-1.5-flash",
                             "temperature": 0.4
@@ -698,6 +703,7 @@ CONFIG_METADATA_2 = {
                         "key": [],
                         "api_base": "https://generativelanguage.googleapis.com/",
                         "timeout": 120,
+                        "http_proxy": "",
                         "model_config": {
                             "model": "gemini-2.0-flash-exp",
                             "temperature": 0.4
@@ -739,6 +745,7 @@ CONFIG_METADATA_2 = {
                         "key": [],
                         "api_base": "https://api.302.ai/v1",
                         "timeout": 120,
+                        "http_proxy": "",
                         "model_config": {
                             "model": "gpt-4.1-mini",
                             "temperature": 0.4
