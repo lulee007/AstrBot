@@ -216,7 +216,11 @@ def get_config(key: str = None):
 
 @conf.command(name="login-info")
 def get_login_info():
-    """显示 Web 管理面板的登录信息"""
+    """显示 Web 管理面板的登录信息
+
+    在 Docker 环境中使用示例:
+    docker exec -e ASTRBOT_ROOT=/AstrBot astrbot-container astrbot conf login-info
+    """
     config = _load_config()
 
     try:
@@ -239,6 +243,11 @@ def get_login_info():
         except (KeyError, TypeError):
             click.echo("  http://localhost:6185 (默认端口)")
             click.echo("  http://your-server-ip:6185 (默认端口)")
+
+        click.echo()
+        click.echo("📋 Docker 环境使用说明:")
+        click.echo("  如果在 Docker 中运行，请使用以下命令格式:")
+        click.echo("  docker exec -e ASTRBOT_ROOT=/AstrBot <容器名> astrbot conf login-info")
 
     except KeyError:
         click.echo("❌ 无法找到登录配置，请先运行 'astrbot init' 初始化")
