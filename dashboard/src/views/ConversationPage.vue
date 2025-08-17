@@ -91,7 +91,7 @@
 
                 <v-card-text class="pa-0">
                     <v-data-table :headers="tableHeaders" :items="conversations" :loading="loading" density="comfortable"
-                        hide-default-footer items-per-page="10" class="elevation-0"
+                        hide-default-footer class="elevation-0"
                         :items-per-page="pagination.page_size" :items-per-page-options="[10, 20, 50, 100]"
                         @update:options="handleTableOptions">
                         <template v-slot:header.selection="{ column }">
@@ -171,9 +171,44 @@
                     </v-data-table>
 
                     <!-- 分页控制 -->
-                    <div class="d-flex justify-end pa-4">
-                        <v-pagination v-model="pagination.page" :length="pagination.total_pages" :disabled="loading"
-                            @update:model-value="fetchConversations" rounded="circle"></v-pagination>
+                    <div class="d-flex justify-between align-center pa-4" v-if="pagination.total > 0">
+                        <!-- 分页信息 -->
+                        <div class="d-flex align-center">
+                            <v-chip color="primary" variant="outlined" size="small" class="mr-2">
+                                共 {{ pagination.total }} 条记录
+                            </v-chip>
+                            <v-chip color="secondary" variant="outlined" size="small" class="mr-2">
+                                第 {{ pagination.page }} / {{ pagination.total_pages }} 页
+                            </v-chip>
+                            <v-select
+                                v-model="pagination.page_size"
+                                :items="[10, 20, 50, 100]"
+                                density="compact"
+                                variant="outlined"
+                                hide-details
+                                class="page-size-selector"
+                                style="width: 100px;"
+                                prefix="每页"
+                                suffix="条"
+                                @update:model-value="changePageSize">
+                            </v-select>
+                        </div>
+                        
+                        <!-- 分页按钮 -->
+                        <v-pagination 
+                            v-model="pagination.page" 
+                            :length="pagination.total_pages" 
+                            :disabled="loading"
+                            @update:model-value="fetchConversations" 
+                            rounded="circle"
+                            :total-visible="7"
+                            show-first-last-page>
+                        </v-pagination>
+                    </div>
+                    
+                    <!-- 无数据时的占位 -->
+                    <div v-else class="pa-4 text-center text-medium-emphasis">
+                        <span>{{ tm('status.noData') }}</span>
                     </div>
                 </v-card-text>
             </v-card>
@@ -650,6 +685,12 @@ export default {
             }
         },
 
+        // 改变页面大小
+        changePageSize() {
+            this.pagination.page = 1; // 重置到第一页
+            this.fetchConversations();
+        },
+
         // 从会话ID解析平台和消息类型信息
         parseSessionId(userId) {
             if (!userId) return { platform: 'default', messageType: 'default', sessionId: '' };
@@ -1077,6 +1118,16 @@ export default {
 <style>
 .conversation-page {
     padding: 20px;
+}
+
+/* 页面大小选择器样式 */
+.page-size-selector .v-field__input {
+    text-align: center;
+}
+
+.page-size-selector .v-field--variant-outlined .v-field__outline__start,
+.page-size-selector .v-field--variant-outlined .v-field__outline__end {
+    border-radius: 12px;
 }
 
 .actions-wrapper {
