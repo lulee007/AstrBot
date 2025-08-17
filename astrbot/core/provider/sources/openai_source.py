@@ -81,6 +81,17 @@ class ProviderOpenAIOfficial(Provider):
 
     async def _query(self, payloads: dict, tools: FuncCall) -> LLMResponse:
         if tools:
+            # Check if we need to add googleSearch function for Gemini(OpenAI Compatible)
+            if (
+                self.provider_config.get("enable_google_search", False)
+                and self.provider_config.get("api_base", "").find(
+                    "generativelanguage.googleapis.com"
+                )
+                != -1
+            ):
+                # Add googleSearch function as alias to web_search
+                await self._add_google_search_tool(tools)
+
             model = payloads.get("model", "").lower()
             omit_empty_param_field = "gemini" in model
             tool_list = tools.get_func_desc_openai_style(
@@ -124,6 +135,17 @@ class ProviderOpenAIOfficial(Provider):
     ) -> AsyncGenerator[LLMResponse, None]:
         """流式查询API，逐步返回结果"""
         if tools:
+            # Check if we need to add googleSearch function for Gemini(OpenAI Compatible)
+            if (
+                self.provider_config.get("enable_google_search", False)
+                and self.provider_config.get("api_base", "").find(
+                    "generativelanguage.googleapis.com"
+                )
+                != -1
+            ):
+                # Add googleSearch function as alias to web_search
+                await self._add_google_search_tool(tools)
+
             model = payloads.get("model", "").lower()
             omit_empty_param_field = "gemini" in model
             tool_list = tools.get_func_desc_openai_style(
@@ -553,3 +575,35 @@ class ProviderOpenAIOfficial(Provider):
             image_bs64 = base64.b64encode(f.read()).decode("utf-8")
             return "data:image/jpeg;base64," + image_bs64
         return ""
+
+    async def _add_google_search_tool(self, tools: FuncCall) -> None:
+        """Add googleSearch function as an alias to web_search for Gemini(OpenAI Compatible)"""
+        # Check if googleSearch is already added
+        for func in tools.func_list:
+            if func.name == "googleSearch":
+                return
+
+        # Check if web_search exists
+        web_search_func = None
+        for func in tools.func_list:
+            if func.name == "web_search":
+                web_search_func = func
+                break
+
+        if web_search_func is None:
+            # If web_search is not available, don't add googleSearch
+            return
+
+        # Add googleSearch as an alias to web_search with English description
+        tools.add_func(
+            name="googleSearch",
+            func_args=[
+                {
+                    "type": "string",
+                    "name": "query",
+                    "description": "The most relevant search keywords for the user's question, used to search on Google.",
+                }
+            ],
+            desc="Search the internet to answer user questions using Google search. Call this tool when users need to search the web for real-time information.",
+            handler=web_search_func.handler,
+        )
