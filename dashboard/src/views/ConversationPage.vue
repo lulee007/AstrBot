@@ -72,7 +72,7 @@
                             已选择 {{ selectedCount }} 个
                         </v-chip>
                         <v-btn color="error" size="small" variant="tonal" 
-                               prepend-icon="mdi-delete-multiple" @click="confirmBulkDelete" class="mr-2">
+                               prepend-icon="mdi-delete" @click="confirmBulkDelete" class="mr-2">
                             批量删除
                         </v-btn>
                         <v-btn color="grey" size="small" variant="text" @click="clearSelection">
