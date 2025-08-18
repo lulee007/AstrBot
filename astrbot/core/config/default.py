@@ -70,7 +70,7 @@ DEFAULT_CONFIG = {
         "streaming_response": False,
         "show_tool_use_status": False,
         "streaming_segmented": False,
-        "max_agent_step": 30
+        "max_agent_step": 30,
     },
     "provider_stt_settings": {
         "enable": False,

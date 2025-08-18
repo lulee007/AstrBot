@@ -423,7 +423,9 @@ class LLMRequestSubStage(Stage):
         if req.func_tool:
             provider_cfg = provider.provider_config.get("modalities", ["tool_use"])
             if "tool_use" not in provider_cfg:
-                logger.debug(f"用户设置提供商 {provider} 不支持工具使用，清空工具列表。")
+                logger.debug(
+                    f"用户设置提供商 {provider} 不支持工具使用，清空工具列表。"
+                )
                 req.func_tool = None
 
         # run agent

@@ -376,9 +376,11 @@ def register_llm_tool(name: str = None, **kwargs):
             # print(f"Registering tool {llm_tool_name} for agent", registering_agent._agent.name)
             if registering_agent._agent.tools is None:
                 registering_agent._agent.tools = []
-            registering_agent._agent.tools.append(llm_tools.spec_to_func(
-                llm_tool_name, args, docstring.description.strip(), awaitable
-            ))
+            registering_agent._agent.tools.append(
+                llm_tools.spec_to_func(
+                    llm_tool_name, args, docstring.description.strip(), awaitable
+                )
+            )
 
         return awaitable
 
