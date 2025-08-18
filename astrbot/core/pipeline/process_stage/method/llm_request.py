@@ -200,6 +200,18 @@ class FunctionToolExecutor(BaseFunctionToolExecutor[AstrAgentContext]):
 
 
 class MainAgentHooks(BaseAgentRunHooks[AgentContextWrapper]):
+    async def on_tool_start(self, run_context, tool, tool_args):
+        # 执行 Tool 开始事件钩子
+        await call_event_hook(
+            run_context.event, EventType.OnToolStartEvent, tool, tool_args
+        )
+
+    async def on_tool_end(self, run_context, tool, tool_args, tool_result):
+        # 执行 Tool 完成事件钩子
+        await call_event_hook(
+            run_context.event, EventType.OnToolEndEvent, tool, tool_args, tool_result
+        )
+
     async def on_agent_done(self, run_context, llm_response):
         # 执行事件钩子
         await call_event_hook(
