@@ -51,6 +51,10 @@ DEFAULT_CONFIG = {
         "enable": True,
         "default_provider_id": "",
         "default_image_caption_provider_id": "",
+        "default_summarize_provider_id": "",
+        "context_exceed_calc_method": "token_size",
+        "max_token_size": 128000,
+        "max_context_length": 100,
         "image_caption_prompt": "Please describe the image using Chinese.",
         "provider_pool": ["*"],  # "*" 表示使用所有可用的提供者
         "wake_prefix": "",
@@ -64,7 +68,6 @@ DEFAULT_CONFIG = {
         "default_personality": "default",
         "persona_pool": ["*"],
         "prompt_prefix": "",
-        "max_context_length": -1,
         "dequeue_context_length": 1,
         "streaming_response": False,
         "show_tool_use_status": False,
@@ -1832,6 +1835,12 @@ CONFIG_METADATA_3 = {
                         "_special": "select_provider",
                         "hint": "留空时使用第一个模型。",
                     },
+                    "provider_settings.default_summarize_provider_id": {
+                        "description": "默认对话总结模型",
+                        "type": "string",
+                        "_special": "select_provider",
+                        "hint": "留空代表不进行对话总结。可用于压缩上下文以减少 token 用量，并一定程度上保持历史聊天记忆。",
+                    },
                     "provider_settings.default_image_caption_provider_id": {
                         "description": "默认图片转述模型",
                         "type": "string",
@@ -1849,6 +1858,28 @@ CONFIG_METADATA_3 = {
                         "type": "string",
                         "hint": "留空代表不使用。",
                         "_special": "select_provider_tts",
+                    },
+                    "provider_settings.context_exceed_calc_method": {
+                        "description": "上下文超限的触发策略",
+                        "type": "string",
+                        "options": ["token_size", "context_length"],
+                        "labels": ["基于 Token 长度(估算)", "基于对话轮数"],
+                        "hint": "如配置了对话总结模型，则触发时总结对话内容，否则丢弃最旧部分。"
+                    },
+                    "provider_settings.max_context_length": {
+                        "description": "对话轮数上限",
+                        "type": "int",
+                        "condition": {
+                            "provider_settings.context_exceed_calc_method": "context_length"
+                        }
+                    },
+                    "provider_settings.max_token_size": {
+                        "description": "Token 长度上限(估算)",
+                        "type": "int",
+                        "hint": "超出这个数量时丢弃最旧的部分。",
+                        "condition": {
+                            "provider_settings.context_exceed_calc_method": "token_size"
+                        }
                     },
                     "provider_settings.image_caption_prompt": {
                         "description": "图片转述提示词",
@@ -1926,7 +1957,7 @@ CONFIG_METADATA_3 = {
                     },
                     "provider_settings.max_agent_step": {
                         "description": "工具调用轮数上限",
-                        "type": "bool",
+                        "type": "int",
                     },
                     "provider_settings.streaming_response": {
                         "description": "流式回复",
@@ -1935,11 +1966,6 @@ CONFIG_METADATA_3 = {
                     "provider_settings.streaming_segmented": {
                         "description": "不支持流式回复的平台采取分段输出",
                         "type": "bool",
-                    },
-                    "provider_settings.max_context_length": {
-                        "description": "最多携带对话轮数",
-                        "type": "int",
-                        "hint": "超出这个数量时丢弃最旧的部分，一轮聊天记为 1 条。-1 为不限制。",
                     },
                     "provider_settings.dequeue_context_length": {
                         "description": "丢弃对话轮数",
